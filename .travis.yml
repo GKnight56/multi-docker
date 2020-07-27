@@ -15,10 +15,10 @@ script:
 # after test completes successfully
 after_success:
   # build prod images
-  - docker build -t stan56/multi-client -f ./client
-  - docker build -t stan56/multi-nginx -f ./nginx
-  - docker build -t stan56/multi-server -f ./server
-  - docker build -t stan56/multi-worker -f ./worker
+  - docker build -t stan56/multi-client ./client
+  - docker build -t stan56/multi-nginx ./nginx
+  - docker build -t stan56/multi-server ./server
+  - docker build -t stan56/multi-worker ./worker
   # log in to Docker Hub
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # push prod images to Docker Hub
