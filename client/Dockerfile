@@ -32,7 +32,7 @@ FROM nginx
 # this option will only have effect in beanstalk
 EXPOSE 3000
 
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # copy from "builder" phase
 COPY --from=builder /app/build /usr/share/nginx/html
