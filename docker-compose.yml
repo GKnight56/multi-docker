@@ -1,0 +1,66 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:10.5'
+  redis:
+    image: 'redis:latest'
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      # working dir to find dockerfile and associated files
+      context: ./nginx
+    ports: 
+      # <host_port>:<container_port>
+      - '3000:80'
+
+  # calling server "api" to avoid potential nginx cfg file issues
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      # working dir to find dockerfile and associated files
+      context: ./server
+    volumes:
+      # "bookmark" the container's /app dir 
+      # so next directive doesn't overwrite it
+      - /app/node_modules
+      # map local CWD to dir inside container
+      # <host_dir>:<container_dir>
+      - ./server:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      # working dir to find dockerfile and associated files
+      context: ./client
+    volumes:
+      # "bookmark" the container's /app dir 
+      # so next directive doesn't overwrite it
+      - /app/node_modules
+      # map local CWD to dir inside container
+      # <host_dir>:<container_dir>
+      - ./client:/app
+    # same as "run -it"
+    stdin_open: true
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      # working dir to find dockerfile and associated files
+      context: ./worker
+    volumes:
+      # "bookmark" the container's /app dir 
+      # so next directive doesn't overwrite it
+      - /app/node_modules
+      # map local CWD to dir inside container
+      # <host_dir>:<container_dir>
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
