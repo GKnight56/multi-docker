@@ -1,0 +1,28 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+# build docker image before running the test
+before_install:
+  - docker build -t stan56/react-test -f ./client/Dockerfile.dev ./client
+
+# run the test suite
+# CI option added for test to exit on completion instead of waiting for input
+script:
+  - docker run -e CI=true stan56/react-test npm test
+
+# after test completes successfully
+after_success:
+  # build prod images
+  - docker build -t stan56/multi-client -f ./client
+  - docker build -t stan56/multi-nginx -f ./nginx
+  - docker build -t stan56/multi-server -f ./server
+  - docker build -t stan56/multi-worker -f ./worker
+  # log in to Docker Hub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # push prod images to Docker Hub
+  - docker push stan56/multi-client
+  - docker push stan56/multi-nginx
+  - docker push stan56/multi-server
+  - docker push stan56/multi-worker
