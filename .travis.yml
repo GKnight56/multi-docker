@@ -26,3 +26,17 @@ after_success:
   - docker push stan56/multi-nginx
   - docker push stan56/multi-server
   - docker push stan56/multi-worker
+
+# deploy to AWS Beanstalk
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-1"
+  app: "multi-docker"
+  env: "MultiDocker-env"
+  bucket_name: "elasticbeanstalk-us-east-1-508593366803"
+  bucket_path:  "docker-multi"
+  # specify GitHub branch to deploy from
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
